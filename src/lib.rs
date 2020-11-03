@@ -38,9 +38,9 @@ impl <'iter, T> Iterator for MyMutableIterator<'iter, T> {
     // allreferences have lifetime, so we have to define them explicitly
     // we're borrowning self for how ever long fn next lasts for.
     fn next<'next>(&'next mut self) -> Option<Self::Item> {
-        let slice = &mut self.slice;
-        let slice = std::mem::replace(slice, &mut []);
-        let (first, rest) = slice.split_first_mut()?;
+        let slice1 = &mut self.slice;
+        let slice2 = std::mem::replace(slice1, &mut []);
+        let (first, rest) = slice2.split_first_mut()?;
         self.slice = rest;
         Some(first)
 
