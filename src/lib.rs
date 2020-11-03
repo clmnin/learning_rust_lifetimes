@@ -1,6 +1,6 @@
 // MyIterWrapper is generic over lifetime a and type T
 // MyIterWrapper lives on as long as the slice lives for.
-struct MyIterWrapper<'a, T> {
+struct MyIterator<'a, T> {
     slice: &'a [T],
 }
 
@@ -9,22 +9,19 @@ struct MyIterWrapper<'a, T> {
 // type like this
 // impl Ierator for MyIterWrapper<'static, i32>{...}
 // And these generics are pased on to MyIterWrapper
-impl<'a, T> Iterator for MyIterWrapper<'a, T> {
+impl<'a, T> Iterator for MyIterator<'a, T> {
     // the element that we yield out of iter for iteration lives as long as 
     // MyIterWrapper does (which in turn lives for as long as the)
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
         // next fn yields out the next item
         
-        if self.slice.is_empty() {
-            return  None;
-        }
-        // get the first element
-        let element = self.slice.get(0);
-        // set self.slice equal to the other element
-        self.slice = &self.slice[1..];
+        // using split_first to get reference of the first element, 
+        // if empty it returns None (thus saved a few lines of code)
+        let (element, rest) = self.slice.split_first()?;
+        self.slice = rest;
         // return first element
-        element
+        Some(element)
     }
 }
 
@@ -34,7 +31,7 @@ mod tests {
     #[test]
     fn it_works() {
         let collection: Vec<i32> = vec![1,2,3,4];
-        let wrapper = MyIterWrapper {
+        let wrapper = MyIterator {
             slice: &collection[..],
         };
 
